@@ -9,26 +9,31 @@ static int bfsSearch(User* rootUser, User* targetUser) {
     if(nullptr == rootUser || nullptr == targetUser) return -1;
 
     std::queue<const User*> toVisit;
-    int nodesInCurrent;
+
+    // Number of nodes left in current level and next one
+    int nodesInCurrent = 1;
+    int nodesInNext = 0;
 
     // map with visited nodes, to avoid loops and to store the
     // length of the path from rootUser to given node
     std::unordered_map<const User*, int> visited;
 
-    // start with target user and SE
     toVisit.push(rootUser);
-    nodesInCurrent = 1;
     int levelNo = 1;
-    int nodesInNext = 0;
 
     while(!toVisit.empty()) {
         const User* curNode = toVisit.front();
         toVisit.pop();
         --nodesInCurrent;
 
+        // Visit this node, storing it's distance and adding all it's
+        // children to the toVisit queue. If this is the targetNode,
+        // the algorithm is finished as edge costs are 1, so the first
+        // loop that ends up here is the shortest path.
         if(visited.end() == visited.find(curNode)) {
-
             visited.insert(std::make_pair(curNode, levelNo));
+            if(curNode == targetUser) break;
+
             curNode->forEachFriend([&nodesInNext, &toVisit](const User *fr) -> void {
                 toVisit.push(fr);
                 ++nodesInNext;
